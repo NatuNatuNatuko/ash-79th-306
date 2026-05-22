@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "374820919742",
+    "project_id": "ash-79th-306",
+    "storage_bucket": "ash-79th-306.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:374820919742:android:6c6e1aaad1aaf1034ac1ef",
+        "android_client_info": {
+          "package_name": "com.example.asahi_79th_306"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAA6KjArdz1p7EvBvJadNWbrsA4x9lHQIQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
