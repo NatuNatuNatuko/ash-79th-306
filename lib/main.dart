@@ -842,13 +842,15 @@ class _HomePageState extends State<HomePage> {
             
             ),
             const SizedBox(height: 12),
-            Text(
-              latestStory != null
-                  ? latestStory.content.length > 200
-                      ? '${latestStory.content.substring(0, 200)}…'
-                      : latestStory.content
-                  : 'まだあらすじが投稿されていません。',
-        ),
+            Center(
+              child: Text(
+                latestStory != null
+                    ? latestStory.content.length > 200
+                        ? '${latestStory.content.substring(0, 200)}…'
+                        : latestStory.content
+                    : 'まだあらすじが投稿されていません。',
+                      ),
+            ),
            
             const Divider(height: 32, thickness: 1.2),
             
