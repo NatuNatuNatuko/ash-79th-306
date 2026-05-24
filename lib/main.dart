@@ -545,7 +545,14 @@ class _AnimatedTabPageState extends State<AnimatedTabPage> {
                 ],
               ),
             ),
-            
+            ListTile(
+  leading: const Icon(Icons.menu_book),
+  title: const Text('あらすじ'),
+  onTap: () {
+    Navigator.pop(context);
+    _openPage(StoryPage());
+  },
+),
             ListTile(
               leading: const Icon(Icons.people),
               title: const Text('キャスト紹介'),
@@ -826,6 +833,28 @@ class _HomePageState extends State<HomePage> {
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
+                'あらすじプレビュー',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            
+            ),
+            const SizedBox(height: 12),
+            Text(
+              latestStory != null
+                  ? latestStory.content.length > 200
+                      ? '${latestStory.content.substring(0, 200)}…'
+                      : latestStory.content
+                  : 'まだあらすじが投稿されていません。',
+        ),
+           
+            const Divider(height: 32, thickness: 1.2),
+            
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
                 '最新ブログ',
                 style: TextStyle(
                   fontSize: 20,
@@ -887,66 +916,7 @@ class _HomePageState extends State<HomePage> {
                 child: const Text('もっと見る'),
               ),
             ),
-            const Divider(height: 32, thickness: 1.2),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'あらすじプレビュー',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
             
-            ),
-            const SizedBox(height: 12),
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (latestStory != null) ...[
-                      Text(
-                        latestStory.author,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        latestStory.content.length > 140
-                            ? '${latestStory.content.substring(0, 140)}…'
-                            : latestStory.content,
-                        style: const TextStyle(fontSize: 14, height: 1.4),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        _formatTime(latestStory.timestamp),
-                        style: const TextStyle(
-                          color: Colors.black54,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ] else ...[
-                      const Text(
-                        'あらすじ投稿がまだありません。ぜひ投稿してみてください。',
-                        style: TextStyle(fontSize: 14, color: Colors.black54),
-                      ),
-                    ],
-                    const SizedBox(height: 12),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      
-                    ),
-                  ],
-                ),
-              ),
-            ),
             const Divider(height: 32, thickness: 1.2),
             const Align(
               alignment: Alignment.centerLeft,
