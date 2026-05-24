@@ -502,34 +502,6 @@ class _CastPageState extends State<CastPage> {
   }
 }
 
-class StoryPost {
-  final String author;
-  final String content;
-  final DateTime timestamp;
-
-  StoryPost({
-    required this.author,
-    required this.content,
-    required this.timestamp,
-  });
-}
-
-class CastPost {
-  final String actorName;
-  final String role;
-  final String comment;
-  final String? imagePath;
-  final DateTime timestamp;
-
-  CastPost({
-    required this.actorName,
-    required this.role,
-    required this.comment,
-    this.imagePath,
-    required this.timestamp,
-  });
-}
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
