@@ -1,10 +1,17 @@
 import 'package:asahi_79th_306/Kei.dart';
+import 'package:asahi_79th_306/blog.dart';
+import 'package:asahi_79th_306/link.dart';
+import 'package:asahi_79th_306/pages.dart' hide EmptyStateCard;
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'models.dart';
+import 'cast.dart' hide CastIntroPage;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -13,40 +20,9 @@ void main() async {
   runApp(const MyApp());
 }
 
-final posts = <Post>[];
-final diaryEntries = <DiaryEntry>[];
-final storyPosts = <StoryPost>[];
-final castPosts = <CastPost>[];
-
-class DiaryEntry {
-  final String title;
-  final String description;
-  final String? imagePath;
-  final DateTime timestamp;
-
-  DiaryEntry({
-    required this.title,
-    required this.description,
-    this.imagePath,
-    required this.timestamp,
-  });
-}
-class Post {
-  final String author;
-  final String content;
-  final DateTime timestamp;
-
-  Post({
-    required this.author,
-    required this.content,
-    required this.timestamp,
-  });
-}
-
 class StoryPage extends StatefulWidget {
-  final VoidCallback onPostAdded;
-
-  const StoryPage({super.key, required this.onPostAdded});
+  
+  const StoryPage();
 
   @override
   State<StoryPage> createState() => _StoryPageState();
@@ -80,9 +56,7 @@ class _StoryPageState extends State<StoryPage> {
       ),
     );
 
-    _authorController.clear();
-    _contentController.clear();
-    widget.onPostAdded();
+    
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('あらすじを投稿しました！')),
@@ -531,65 +505,100 @@ class AnimatedTabPage extends StatefulWidget {
 }
 
 class _AnimatedTabPageState extends State<AnimatedTabPage> {
+  void _openPage(Widget page) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => page),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 5,
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: const Text(
-            '白雪姫',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Shirayukihime'
+    return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                color: Colors.indigo,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(
+                    '白雪姫',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    '公演サイトへようこそ',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          leadingWidth: 85, 
-          leading: IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-                   Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ProfilePage(),
+            
+            ListTile(
+              leading: const Icon(Icons.people),
+              title: const Text('キャスト紹介'),
+              onTap: () {
+                Navigator.pop(context);
+                _openPage(const CastIntroPage());
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.article),
+              title: const Text('ブログ'),
+              onTap: () {
+                Navigator.pop(context);
+                _openPage(const DiaryPage());
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.public),
+              title: const Text('他サイト'),
+              onTap: () {
+                Navigator.pop(context);
+                _openPage(LinkPage());
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('制作者について'),
+              onTap: () {
+                Navigator.pop(context);
+                _openPage(ProfilePage());
+              },
+            ),
+          ],
+        ),
       ),
-    );
-  }),
-          bottom: const TabBar(
-            indicatorColor: Color.fromARGB(255, 255, 255, 255),
-            indicatorWeight: 4,
-
-            labelStyle: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-
-            tabs: [
-              Tab(
-                icon: Icon(Icons.home),
-                text: 'ホーム',
-              ),
-              Tab(
-                icon: Icon(Icons.menu_book),
-                text: 'あらすじ',
-              ),
-              Tab(
-                icon: Icon(Icons.people),
-                text: 'キャスト',
-              ),
-              Tab(
-                icon: Icon(Icons.article),
-                text: 'ブログ',
-              ),
-              Tab(
-                icon: Icon(Icons.chat),
-                text: '投稿',
-              ),
-            ],
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text(
+          '白雪姫',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Shirayukihime',
           ),
         ),
-bottomNavigationBar: Container(
+        leadingWidth: 85,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+      ),
+      bottomNavigationBar: Container(
         color: Colors.black,
         padding: const EdgeInsets.all(7),
         child: const Text(
@@ -600,21 +609,7 @@ bottomNavigationBar: Container(
           ),
         ),
       ),
-        body: TabBarView(
-          children: [
-            HomePage(onPostAdded: () => setState(() {})),
-
-            StoryPage(onPostAdded: () => setState(() {})),
-
-            CastPage(onPostAdded: () => setState(() {})),
-
-            DiaryPage(),
-
-            PostPage(onPostAdded: () => setState(() {})),
-          ],
-        ),
-        
-      ),
+      body: HomePage(onPostAdded: () => setState(() {})),
     );
   }
 }
@@ -756,118 +751,346 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late final PageController _castPageController;
+  Timer? _castAutoScrollTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _castPageController = PageController(viewportFraction: 0.9);
+    _castAutoScrollTimer = Timer.periodic(
+      const Duration(seconds: 4),
+      (_) => _advanceCastSlider(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _castAutoScrollTimer?.cancel();
+    _castPageController.dispose();
+    super.dispose();
+  }
+
+  void _advanceCastSlider() {
+    if (castPosts.isEmpty || !_castPageController.hasClients) return;
+    final nextPage = (_castPageController.page?.round() ?? 0) + 1;
+    final page = nextPage >= castPosts.length ? 0 : nextPage;
+    _castPageController.animateToPage(
+      page,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final latestBlogPosts = diaryEntries.reversed.take(3).toList();
+    final latestStory = storyPosts.isNotEmpty ? storyPosts.last : null;
+
     return Container(
       color: const Color(0xFFE3F2FD),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-               SizedBox(height: 16),
-               Image.asset('assets/example.png', height: 100),
-                const SizedBox(height: 8),
-                const Text(
-                  'クラス劇2026へようこそ',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black54,
-                  ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Card(
+              margin: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(18),
+                child: Column(
+                  children: [
+                    Image.asset('assets/example.png', height: 100),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'クラス劇2026へようこそ',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      '最新情報をチェックして、あらすじ・キャスト・ブログを楽しんでください。',
+                      style: TextStyle(color: Colors.black54),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-          const Divider(thickness: 2),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-            child: Align(
+            const SizedBox(height: 20),
+            const Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                '最新の投稿',
+                '最新ブログ',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-          ),
-          Expanded(
-            child: posts.isEmpty
-                ? const Center(
-                    child: Text(
-                      'まだ投稿がありません',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black54,
+            const SizedBox(height: 12),
+            if (latestBlogPosts.isEmpty)
+              const EmptyStateCard(message: 'まだブログ記事がありません。')
+            else
+              Column(
+                children: latestBlogPosts.map((entry) {
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            entry.title,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            entry.description.length > 100
+                                ? '${entry.description.substring(0, 100)}…'
+                                : entry.description,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${entry.timestamp.year}/${entry.timestamp.month}/${entry.timestamp.day}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  )
-                : ListView.builder(
-                    itemCount: posts.length,
-                    reverse: true,
-                    itemBuilder: (context, index) {
-                      final post = posts[posts.length - 1 - index];
-                      final postIndex = posts.length - 1 - index;
-                      return Card(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 12.0,
-                          vertical: 8.0,
+                  );
+                }).toList(),
+              ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BlogPage()),
+                ),
+                child: const Text('もっと見る'),
+              ),
+            ),
+            const Divider(height: 32, thickness: 1.2),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'あらすじプレビュー',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            
+            ),
+            const SizedBox(height: 12),
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (latestStory != null) ...[
+                      Text(
+                        latestStory.author,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        latestStory.content.length > 140
+                            ? '${latestStory.content.substring(0, 140)}…'
+                            : latestStory.content,
+                        style: const TextStyle(fontSize: 14, height: 1.4),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        _formatTime(latestStory.timestamp),
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ] else ...[
+                      const Text(
+                        'あらすじ投稿がまだありません。ぜひ投稿してみてください。',
+                        style: TextStyle(fontSize: 14, color: Colors.black54),
+                      ),
+                    ],
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Divider(height: 32, thickness: 1.2),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'キャスト紹介',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 240,
+              child: castPosts.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'キャスト紹介がまだありません。',
+                        style: TextStyle(color: Colors.black54),
+                      ),
+                    )
+                  : PageView.builder(
+                      controller: _castPageController,
+                      itemCount: castPosts.length,
+                      itemBuilder: (context, index) {
+                        final entry = castPosts[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          post.author,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        Text(
-                                          _formatTime(post.timestamp),
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.black54,
-                                          ),
-                                        ),
-                                      ],
+                                  Text(
+                                    entry.actorName,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    color: Colors.red,
-                                    onPressed: () =>
-                                        _showDeleteDialog(context, postIndex),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    entry.role,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Expanded(
+                                    child: Text(
+                                      entry.comment.isEmpty
+                                          ? 'コメントなし'
+                                          : entry.comment.length > 100
+                                              ? '${entry.comment.substring(0, 100)}…'
+                                              : entry.comment,
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    _formatCastDate(entry.timestamp),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.black54,
+                                    ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                post.content,
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ],
+                        );
+                      },
+                    ),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CastIntroPage()),
+                ),
+                child: const Text('もっと見る'),
+              ),
+            ),
+            const Divider(height: 32, thickness: 1.2),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Instagram',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    const Icon(Icons.camera_alt, color: Colors.pinkAccent, size: 32),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            '公式Instagramは準備中です。',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            '公開したらここからアクセスできます。',
+                            style: TextStyle(fontSize: 14, color: Colors.black54),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LinkPage()),
+                      ),
+                      child: const Text('見る'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   }
@@ -889,36 +1112,8 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _showDeleteDialog(BuildContext context, int index) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('投稿を削除'),
-          content: const Text('この投稿を削除してもよろしいですか？'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('キャンセル'),
-            ),
-            TextButton(
-              onPressed: () {
-                posts.removeAt(index);
-                Navigator.pop(context);
-                setState(() {});
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('投稿を削除しました')),
-                );
-              },
-              child: const Text(
-                '削除',
-                style: TextStyle(color: Colors.red),
-              ),
-            ),
-          ],
-        );
-      },
-    );
+  String _formatCastDate(DateTime dateTime) {
+    return '${dateTime.year}/${dateTime.month}/${dateTime.day}';
   }
 }
 

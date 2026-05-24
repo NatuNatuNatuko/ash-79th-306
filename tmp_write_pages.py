@@ -1,4 +1,112 @@
+from pathlib import Path
+
+cast = Path('lib/cast.dart')
+kei = Path('lib/Kei.dart')
+
+cast.write_text("""import 'dart:io';
 import 'package:flutter/material.dart';
+import 'models.dart';
+
+class CastIntroPage extends StatelessWidget {
+  const CastIntroPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('キャスト紹介')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: castPosts.isEmpty
+            ? const Center(
+                child: Text(
+                  'まだキャスト紹介がありません。',
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                ),
+              )
+            : Column(
+                children: [
+                  SizedBox(
+                    height: 260,
+                    child: PageView.builder(
+                      itemCount: castPosts.length,
+                      itemBuilder: (context, index) {
+                        final entry = castPosts[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    entry.actorName,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    entry.role,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  if (entry.imagePath != null)
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.file(
+                                        File(entry.imagePath!),
+                                        height: 130,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  const SizedBox(height: 10),
+                                  Text(entry.comment.isEmpty ? 'コメントなし' : entry.comment),
+                                  const Spacer(),
+                                  Text(
+                                    '
+                                    \\${entry.timestamp.year}/\\${entry.timestamp.month}/\\${entry.timestamp.day}',
+                                    style: const TextStyle(fontSize: 12, color: Colors.black54),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: castPosts.length,
+                      itemBuilder: (context, index) {
+                        final entry = castPosts[castPosts.length - 1 - index];
+                        return ListTile(
+                          title: Text(entry.actorName),
+                          subtitle: Text(entry.role),
+                          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+}
+""")
+
+kei.write_text("""import 'package:flutter/material.dart';
 import 'models.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -23,7 +131,7 @@ class ProfilePage extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              '旭丘高校79期生。　\nアマチュアイラストレーター、アマチュアプログラマー。かつては動画師としても活動していた。\nイラストは主にデジタルで、セミリアルスタイルを得意としている。\nプログラミングは主にFlutterで、鯱光祭アプリ開発を行っていた。',
+              '旭丘高校79期生。　\\nアマチュアイラストレーター、アマチュアプログラマー。かつては動画師としても活動していた。\\nイラストは主にデジタルで、セミリアルスタイルを得意としている。\\nプログラミングは主にFlutterで、鯱光祭アプリ開発を行っていた。',
               style: TextStyle(fontSize: 16),
             ),
           ],
@@ -106,7 +214,7 @@ class StorySummaryPage extends StatelessWidget {
                           Text(story.content),
                           const SizedBox(height: 10),
                           Text(
-                            '\${story.timestamp.year}/\${story.timestamp.month}/\${story.timestamp.day}',
+                            '\\${story.timestamp.year}/\\${story.timestamp.month}/\\${story.timestamp.day}',
                             style: const TextStyle(fontSize: 12, color: Colors.black54),
                           ),
                         ],
@@ -225,3 +333,5 @@ class InstagramPage extends StatelessWidget {
     );
   }
 }
+""")
+print('wrote files to', cast.resolve(), kei.resolve())
