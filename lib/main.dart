@@ -1,7 +1,7 @@
 import 'package:asahi_79th_306/Kei.dart';
+import 'package:asahi_79th_306/auth.dart';
 import 'package:asahi_79th_306/blog.dart';
 import 'package:asahi_79th_306/link.dart';
-import 'package:asahi_79th_306/pages.dart' hide EmptyStateCard;
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:io';
@@ -10,7 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'models.dart';
-import 'cast.dart' hide CastIntroPage;
+import 'cast.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -561,12 +561,13 @@ class _AnimatedTabPageState extends State<AnimatedTabPage> {
                 _openPage(const CastIntroPage());
               },
             ),
+
             ListTile(
               leading: const Icon(Icons.article),
               title: const Text('ブログ'),
               onTap: () {
                 Navigator.pop(context);
-                _openPage(const DiaryPage());
+                _openPage(const BlogPage());
               },
             ),
             ListTile(
