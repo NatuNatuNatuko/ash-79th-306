@@ -1,4 +1,5 @@
 import 'package:asahi_79th_306/Kei.dart';
+import 'package:asahi_79th_306/auth.dart';
 import 'package:asahi_79th_306/blog.dart';
 import 'package:asahi_79th_306/link.dart';
 import 'package:flutter/material.dart';
@@ -577,6 +578,38 @@ class _AnimatedTabPageState extends State<AnimatedTabPage> {
                 _openPage(ProfilePage());
               },
             ),
+            const Divider(),
+            ListTile(
+              leading: AuthService.instance.isSignedIn
+                  ? const Icon(Icons.logout)
+                  : const Icon(Icons.login),
+              title: AuthService.instance.isSignedIn
+                  ? const Text('ログアウト')
+                  : const Text('ログイン'),
+              onTap: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                Navigator.pop(context);
+                if (AuthService.instance.isSignedIn) {
+                  await AuthService.instance.signOut();
+                  if (!mounted) return;
+                  setState(() {});
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('ログアウトしました')),
+                  );
+                } else {
+                  final result = await Navigator.push<bool>(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                  );
+                  if (result == true && mounted) {
+                    setState(() {});
+                    messenger.showSnackBar(
+                      const SnackBar(content: Text('ログインしました')),
+                    );
+                  }
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -597,17 +630,37 @@ class _AnimatedTabPageState extends State<AnimatedTabPage> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
-            
-          ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => _openPage(const BlogPage()),
-          ),
-        ],
-        
+          
+  if (AuthService.instance.isSignedIn) ...[
+    IconButton(
+      icon: const Icon(Icons.add),
+      onPressed: () => _openPage(const BlogPage()),
+    ),
+    IconButton(
+      icon: const Icon(Icons.logout),
+      onPressed: () async {
+        final navigator = Navigator.of(context);
+        await AuthService.instance.signOut();
+        if (!mounted) return;
+        setState(() {});
+        navigator.popUntil((route) => route.isFirst);
+      },
+    ),
+  ] else ...[
+    IconButton(
+      icon: const Icon(Icons.login),
+      onPressed: () async {
+        final result = await Navigator.push<bool>(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+        if (result == true && mounted) {
+          setState(() {});
+        }
+      },
+    ),
+  ],
+],
       ),
       bottomNavigationBar: Container(
         color: Colors.black,
