@@ -1,5 +1,4 @@
 import 'package:asahi_79th_306/Kei.dart';
-import 'package:asahi_79th_306/auth.dart';
 import 'package:asahi_79th_306/blog.dart';
 import 'package:asahi_79th_306/link.dart';
 import 'package:flutter/material.dart';
@@ -21,8 +20,7 @@ void main() async {
 }
 
 class StoryPage extends StatefulWidget {
-  
-  const StoryPage();
+  const StoryPage({super.key});
 
   @override
   State<StoryPage> createState() => _StoryPageState();
@@ -545,14 +543,7 @@ class _AnimatedTabPageState extends State<AnimatedTabPage> {
                 ],
               ),
             ),
-            ListTile(
-  leading: const Icon(Icons.menu_book),
-  title: const Text('あらすじ'),
-  onTap: () {
-    Navigator.pop(context);
-    _openPage(StoryPage());
-  },
-),
+           
             ListTile(
               leading: const Icon(Icons.people),
               title: const Text('キャスト紹介'),
@@ -605,6 +596,18 @@ class _AnimatedTabPageState extends State<AnimatedTabPage> {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+            
+          ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => _openPage(const BlogPage()),
+          ),
+        ],
+        
       ),
       bottomNavigationBar: Container(
         color: Colors.black,
@@ -1066,23 +1069,6 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-  }
-
-  String _formatTime(DateTime dateTime) {
-    final now = DateTime.now();
-    final difference = now.difference(dateTime);
-
-    if (difference.inSeconds < 60) {
-      return 'たった今';
-    } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}分前';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}時間前';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}日前';
-    } else {
-      return '${dateTime.month}/${dateTime.day}';
-    }
   }
 
   String _formatCastDate(DateTime dateTime) {
